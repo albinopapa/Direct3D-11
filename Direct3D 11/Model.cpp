@@ -76,14 +76,14 @@ UINT Model_Position_Texcoord::GetVertexCount( ) const
 	return vertices.size();
 }
 
-ID3D11Buffer *Model_Position_Texcoord::GetVertexBuffer() const
+const Microsoft::WRL::ComPtr<ID3D11Buffer> &Model_Position_Texcoord::GetVertexBuffer() const
 {
-	return vertex_buffer.Get();
+	return vertex_buffer;
 }
 
-ID3D11Buffer *Model_Position_Texcoord::GetIndexBuffer() const
+const Microsoft::WRL::ComPtr<ID3D11Buffer> &Model_Position_Texcoord::GetIndexBuffer() const
 {
-	return index_buffer.Get();
+	return index_buffer;
 }
 
 D3D11_PRIMITIVE_TOPOLOGY Model_Position_Texcoord::GetTopology( ) const

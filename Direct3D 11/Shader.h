@@ -25,7 +25,7 @@ protected:
 	virtual void Initialize(const DirectX::Blob &VertexBlob,
 		const DirectX::Blob &PixelBlob,
 		const Microsoft::WRL::ComPtr<ID3D11Device> &Device) = 0;
-
+	void LoadShaderFile( const std::string &Filename, DirectX::Blob &ShaderBlob );
 protected:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	// Layout of the vertex buffer

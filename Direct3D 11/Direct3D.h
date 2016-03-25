@@ -21,11 +21,11 @@ public:
 		void** ppInitialData = nullptr)const;
 	ID3D11ShaderResourceView *CreateShaderResource(ID3D11Texture2D *Resource)const;
 
-	ID3D11Device *GetDevice()const;
-	ID3D11DeviceContext *GetContext()const;
-	ID3D11RenderTargetView *GetRenderTarget()const;
-	ID3D11DepthStencilView *GetDepthStencilView()const;
-	IDXGISwapChain *GetSwapChain()const;
+	const Microsoft::WRL::ComPtr<ID3D11Device> &GetDevice()const;
+	const Microsoft::WRL::ComPtr<ID3D11DeviceContext> &GetContext()const;
+	const Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &GetRenderTarget()const;
+	const Microsoft::WRL::ComPtr<ID3D11DepthStencilView> &GetDepthStencilView()const;
+	const Microsoft::WRL::ComPtr<IDXGISwapChain> &GetSwapChain()const;
 private:
 	void InitDeviceAndSwapchain(const Window &Win);
 	void InitRenderTargetAndDepthViews(int Width, int Height);

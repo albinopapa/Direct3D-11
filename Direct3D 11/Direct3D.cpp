@@ -7,7 +7,6 @@ Direct3D::Direct3D(const Window &Win)
 	InitRenderTargetAndDepthViews(Win.GetWidth(), Win.GetHeight());
 }
 
-
 Direct3D::~Direct3D()
 {
 }
@@ -83,10 +82,8 @@ ID3D11Buffer * Direct3D::CreateIndexBuffer(int ElementCount, int SizeOfElement,
 ID3D11Buffer * Direct3D::CreateConstantBuffer(int ElementCount, int SizeOfElement, 
 	void ** ppInitialData)const
 {	
-	// Not sure if this works
-	// TODO: Test assert format
 	UINT size = ElementCount * SizeOfElement;
-	assert(size % 16 == 0 || "Size must be a multiple of 16");
+	assert( size % 16 == 0 );
 
 	D3D11_BUFFER_DESC bd{};
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -110,37 +107,37 @@ ID3D11ShaderResourceView * Direct3D::CreateShaderResource(ID3D11Texture2D * Reso
 	srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srv_desc.Format = td.Format;	
 	
+	// Create the shader resource
 	ID3D11ShaderResourceView *srv = nullptr;
 	HRESULT hr = device->CreateShaderResourceView(Resource, nullptr, &srv);
-
 	assert(SUCCEEDED(hr));
 
 	return srv;
 }
 
-ID3D11Device * Direct3D::GetDevice() const
+const Microsoft::WRL::ComPtr<ID3D11Device> &Direct3D::GetDevice() const
 {
-	return device.Get();
+	return device;
 }
 
-ID3D11DeviceContext * Direct3D::GetContext() const
+const Microsoft::WRL::ComPtr<ID3D11DeviceContext> &Direct3D::GetContext() const
 {
-	return context.Get();
+	return context;
 }
 
-ID3D11RenderTargetView * Direct3D::GetRenderTarget() const
+const Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &Direct3D::GetRenderTarget() const
 {
-	return rtv.Get();
+	return rtv;
 }
 
-ID3D11DepthStencilView * Direct3D::GetDepthStencilView() const
+const Microsoft::WRL::ComPtr<ID3D11DepthStencilView> &Direct3D::GetDepthStencilView() const
 {
-	return dsv.Get();
+	return dsv;
 }
 
-IDXGISwapChain * Direct3D::GetSwapChain() const
+const Microsoft::WRL::ComPtr<IDXGISwapChain> &Direct3D::GetSwapChain() const
 {
-	return swapchain.Get();
+	return swapchain;
 }
 
 void Direct3D::InitDeviceAndSwapchain(const Window & Win)

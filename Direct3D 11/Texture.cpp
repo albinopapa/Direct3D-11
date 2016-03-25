@@ -45,6 +45,7 @@ Texture::Texture( const std::wstring &Filename, const Direct3D & D3D )
 	// Create a temporary buffer to initialize the ID3D11Texture2D
 	UINT buffer_size = width * height * sizeof( unsigned int );
 	std::unique_ptr<BYTE[]> data( std::make_unique<BYTE[]>(buffer_size));
+	assert( data != nullptr );
 
 	// Pass nullptr, to get the entire image
 	UINT stride = width * sizeof( unsigned int );

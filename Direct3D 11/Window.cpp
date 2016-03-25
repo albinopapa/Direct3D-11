@@ -45,6 +45,7 @@ Window::Window(UINT Width, UINT Height, HINSTANCE Instance, INT CmdShow, System 
 	hWnd = CreateWindowEx(
 		ex_style, classname.data(), title.data(), style, r.left, r.top, r.right - r.left,
 		r.bottom - r.top, nullptr, nullptr, Instance, pSystem);
+	assert( hWnd != nullptr );
 
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pSystem));
 

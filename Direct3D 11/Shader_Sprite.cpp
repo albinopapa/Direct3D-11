@@ -13,30 +13,34 @@ Shader_Sprite::~Shader_Sprite()
 {
 }
 
-void Shader_Sprite::Initialize(const DirectX::Blob &VertexBlob,
-	const DirectX::Blob &PixelBlob,
+void Shader_Sprite::Initialize(
+	const DirectX::Blob &VertexBlob, const DirectX::Blob &PixelBlob, 
 	const Microsoft::WRL::ComPtr<ID3D11Device> &Device)
 {
-	Device->CreateVertexShader(VertexBlob.data.get(), VertexBlob.data_size, nullptr,
+	HRESULT hr = Device->CreateVertexShader(
+		VertexBlob.data.get(), VertexBlob.data_size, nullptr, 
 		vertex_shader.GetAddressOf());
+	assert( SUCCEEDED( hr ) );
 
-	Device->CreatePixelShader(PixelBlob.data.get(), PixelBlob.data_size, nullptr,
-		pixel_shader.GetAddressOf());
+	hr = Device->CreatePixelShader(PixelBlob.data.get(), PixelBlob.data_size,
+									nullptr, pixel_shader.GetAddressOf());
+	assert( SUCCEEDED( hr ) );
 
 	D3D11_INPUT_ELEMENT_DESC ied[]
 	{
 		DirectX::CreatePositionElement(),
-		DirectX::CreateTexcoordElement(0)
+		DirectX::CreateTexcoordElement()
 	};
 
 	int ied_count = 2;
 
-	Device->CreateInputLayout(ied, ied_count, VertexBlob.data.get(), 
+	hr = Device->CreateInputLayout(ied, ied_count, VertexBlob.data.get(), 
 		VertexBlob.data_size, layout.GetAddressOf());
-	
+	assert( SUCCEEDED( hr ) );
+
 	CD3D11_SAMPLER_DESC sd( D3D11_DEFAULT );
 
-	HRESULT hr = Device->CreateSamplerState( &sd, sampler.GetAddressOf( ) );
+	hr = Device->CreateSamplerState( &sd, sampler.GetAddressOf( ) );
 	assert( SUCCEEDED( hr ) );
 }
 
@@ -44,32 +48,10 @@ void Shader_Sprite::LoadShaderFiles(const std::string & VertexShaderFilename,
 	const std::string & PixelShaderFilename,
 	const Microsoft::WRL::ComPtr<ID3D11Device> &Device)
 {
-	std::ifstream v_file(VertexShaderFilename, std::ios::ate | std::ios::binary);
-	assert( v_file.is_open( ) );
-
-	int file_size = v_file.tellg();
-	v_file.seekg(std::ios::beg);
-
-	DirectX::Blob v_blob;
-	v_blob.data.reset(new char[file_size]);
-	v_blob.data_size = file_size;
-	v_file.read(v_blob.data.get(), file_size);
-
-	std::ifstream p_file(PixelShaderFilename, std::ios::ate | std::ios::binary);
-	assert( p_file.is_open( ) );
-
-	file_size = p_file.tellg();
-	p_file.seekg( std::ios::beg );
-
-	DirectX::Blob p_blob;
-	p_blob.data.reset(new char[file_size]);
-	p_blob.data_size = file_size;
-	p_file.read(p_blob.data.get(), file_size);
-
-	Initialize(v_blob, p_blob, Device);
-
-	v_file.close();
-	p_file.close();
+	DirectX::Blob v_blob, p_blob;
+	LoadShaderFile( VertexShaderFilename, v_blob );
+	LoadShaderFile( PixelShaderFilename, p_blob );
+	Initialize( v_blob, p_blob, Device );
 }
 
 void Shader_Sprite::Set( Graphics & Gfx )

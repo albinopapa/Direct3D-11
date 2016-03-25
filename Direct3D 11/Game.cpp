@@ -28,10 +28,14 @@ void Game::UpdateFrame()
 	cam.Update( dt );
 	ship.Update( dt );
 
+	// View and projection stay the same for entire frame
 	tb.view = DirectX::XMMatrixTranspose(cam.GetView( ));
 	tb.projection = DirectX::XMMatrixTranspose( cam.GetProjection( win ));
+
+	// World matrix and constant buffer needs to be updated for each model
 	tb.world = DirectX::XMMatrixTranspose( ship.GetWorld());
 	sprite_shader.UpdateVertexConstBuffer( sizeof( tb ), &tb, ship.GetConstBuffer( ) );
+
 
 	gfx.BeginFrame();
 	ComposeFrame();
