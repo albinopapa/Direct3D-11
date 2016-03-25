@@ -13,7 +13,7 @@ Direct3D::~Direct3D()
 }
 
 ID3D11Texture2D * Direct3D::CreateTexture(int Width, int Height, 
-	DXGI_FORMAT Format, D3D11_BIND_FLAG Flag, void ** ppInitialData)
+	DXGI_FORMAT Format, D3D11_BIND_FLAG Flag, BYTE ** ppInitialData)const
 {
 	// Describe the texture to Direct3D
 	D3D11_TEXTURE2D_DESC td{};
@@ -52,43 +52,53 @@ ID3D11Texture2D * Direct3D::CreateTexture(int Width, int Height,
 	return texture;
 }
 
-ID3D11Buffer * Direct3D::CreateVertexBuffer(int Size, int SizeOfElements, void ** ppInitialData)
+ID3D11Buffer * Direct3D::CreateVertexBuffer(int ElementCount, int SizeOfElement,
+	void** ppInitialData)const
 {
+	UINT size = ElementCount * SizeOfElement;
+
 	D3D11_BUFFER_DESC bd{};
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.ByteWidth = Size;
-	bd.StructureByteStride = SizeOfElements;
+	bd.ByteWidth = size;
+	bd.StructureByteStride = SizeOfElement;
 	bd.Usage = D3D11_USAGE_DEFAULT;
 
-	return CreateBuffer(Size, SizeOfElements, bd, ppInitialData);
+	return CreateBuffer(bd, ppInitialData);
 }
 
-ID3D11Buffer * Direct3D::CreateIndexBuffer(int Size, int SizeOfElements, void ** ppInitialData)
+ID3D11Buffer * Direct3D::CreateIndexBuffer(int ElementCount, int SizeOfElement, 
+	void ** ppInitialData)const
 {
+	UINT size = ElementCount * SizeOfElement;
+
 	D3D11_BUFFER_DESC bd{};
 	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.ByteWidth = Size;
-	bd.StructureByteStride = SizeOfElements;
+	bd.ByteWidth = size;
+	bd.StructureByteStride = SizeOfElement;
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	
-	return CreateBuffer(Size, SizeOfElements, bd, ppInitialData);
+	return CreateBuffer(bd, ppInitialData);
 }
 
-ID3D11Buffer * Direct3D::CreateConstantBuffer(int Size, int SizeOfElements, void ** ppInitialData)
+ID3D11Buffer * Direct3D::CreateConstantBuffer(int ElementCount, int SizeOfElement, 
+	void ** ppInitialData)const
 {	
-	assert(Size % 16 == 0 || "Size must be a multiple of 16");
+	// Not sure if this works
+	// TODO: Test assert format
+	UINT size = ElementCount * SizeOfElement;
+	assert(size % 16 == 0 || "Size must be a multiple of 16");
 
 	D3D11_BUFFER_DESC bd{};
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.ByteWidth = Size;
-	bd.StructureByteStride = SizeOfElements;
+	bd.ByteWidth = size;
+	bd.StructureByteStride = SizeOfElement;
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	bd.Usage = D3D11_USAGE_DYNAMIC;
 
-	return CreateBuffer(Size, SizeOfElements, bd, ppInitialData);
+	return CreateBuffer(bd, ppInitialData);
 }
 
-ID3D11ShaderResourceView * Direct3D::CreateShaderResource(ID3D11Texture2D * Resource)
+ID3D11ShaderResourceView * Direct3D::CreateShaderResource(ID3D11Texture2D * Resource)const
 {
 	// Get the description of the texture resouce
 	D3D11_TEXTURE2D_DESC td{};
@@ -101,7 +111,7 @@ ID3D11ShaderResourceView * Direct3D::CreateShaderResource(ID3D11Texture2D * Reso
 	srv_desc.Format = td.Format;	
 	
 	ID3D11ShaderResourceView *srv = nullptr;
-	HRESULT hr = device->CreateShaderResourceView(Resource, &srv_desc, &srv);
+	HRESULT hr = device->CreateShaderResourceView(Resource, nullptr, &srv);
 
 	assert(SUCCEEDED(hr));
 
@@ -159,6 +169,10 @@ void Direct3D::InitDeviceAndSwapchain(const Window & Win)
 	// Setting windowed mode TRUE for windowed, FALSE for full screen
 	scd.Windowed = TRUE;
 
+	int device_params = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#if _DEBUG
+	device_params |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 	// Parameter descriptions for D3D11CreateDeviceAndSwapChain
 	/*
 	 1)		Use default display adapter
@@ -182,7 +196,7 @@ void Direct3D::InitDeviceAndSwapchain(const Window & Win)
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_SINGLETHREADED,
+		device_params,
 		nullptr,
 		0,
 		D3D11_SDK_VERSION,
@@ -203,10 +217,6 @@ void Direct3D::InitRenderTargetAndDepthViews(int Width, int Height)
 	HRESULT hr = swapchain->GetBuffer(0, IID_PPV_ARGS(back_buffer.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
-	// Get the resource description
-	D3D11_TEXTURE2D_DESC td{};
-	back_buffer->GetDesc(&td);
-
 	// Use the texture to initialize the render target view
 	hr = device->CreateRenderTargetView(back_buffer.Get(), nullptr, rtv.GetAddressOf());
 	assert(SUCCEEDED(hr));
@@ -216,24 +226,27 @@ void Direct3D::InitRenderTargetAndDepthViews(int Width, int Height)
 
 	// Zeroing the texture description to reuse for depth buffer texture resource 
 	// description
-	ZeroMemory(&td, sizeof(td));
-	td.ArraySize = 1;
-	td.MipLevels = 1;
-	td.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	td.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	td.SampleDesc = { 1, 0 };
+	D3D11_TEXTURE2D_DESC td{};
 	td.Width = Width;
 	td.Height = Height;
+	td.MipLevels = 1;
+	td.ArraySize = 1;
+	td.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	td.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	td.SampleDesc = { 1, 0 };
 
 	hr = device->CreateTexture2D(&td, nullptr, depth_buffer.GetAddressOf());
 	assert(SUCCEEDED(hr));
 
 	// Use the new texture to initialize the depth stencil view
-	hr = device->CreateDepthStencilView(depth_buffer.Get(), nullptr, dsv.GetAddressOf());
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc{};
+	dsv_desc.Format = td.Format;
+	dsv_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	hr = device->CreateDepthStencilView(depth_buffer.Get(), &dsv_desc, dsv.GetAddressOf());
 	assert(SUCCEEDED(hr));
 }
 
-ID3D11Buffer * Direct3D::CreateBuffer(int Size, int SizeOfElements, const D3D11_BUFFER_DESC & BuffDes, void ** ppInitialData)
+ID3D11Buffer * Direct3D::CreateBuffer(const D3D11_BUFFER_DESC & BuffDes, void ** ppInitialData)const
 {
 	D3D11_SUBRESOURCE_DATA srd{};
 	D3D11_SUBRESOURCE_DATA *pSrd = nullptr;

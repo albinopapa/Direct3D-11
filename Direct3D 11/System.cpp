@@ -7,10 +7,15 @@ int WINAPI WinMain(HINSTANCE Instance, HINSTANCE, LPSTR Args, INT CmdShow)
 	return system.Run();
 }
 
+// Kind of a bad idea to do this, but I did it anyway.  D3d relies on win 
+// to be initialized, and game relies on d3d and win to be initialized.
+// The reason it's a bad idea, is because C++ initializes in the order they
+// are declared in the header (.h) file, not the order they are here.
 System::System(UINT Width, UINT Height, HINSTANCE Instance, INT CmdShow)
 	:
-	win(Width, Height, Instance, CmdShow, this),
-	game(win)
+	win( Width, Height, Instance, CmdShow, this ),
+	d3d( win ),
+	game( d3d, win )
 {
 }
 

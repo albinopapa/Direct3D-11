@@ -2,16 +2,13 @@
 
 
 
-Graphics::Graphics(const Window &Win)
-	:
-	d3d(Win)
+Graphics::Graphics( const Direct3D &D3D, const Window &Win)
 {
-	context = d3d.GetContext();
-	rtv = d3d.GetRenderTarget();
-	dsv = d3d.GetDepthStencilView();
-	swapchain = d3d.GetSwapChain();
+	context = D3D.GetContext();
+	rtv = D3D.GetRenderTarget();
+	dsv = D3D.GetDepthStencilView();
+	swapchain = D3D.GetSwapChain();
 }
-
 
 Graphics::~Graphics()
 {
@@ -28,6 +25,22 @@ void Graphics::BeginFrame(float A, float R, float G, float B)
 void Graphics::EndFrame()
 {
 	swapchain->Present(NULL, NULL);
+}
+
+void Graphics::SetTopology( D3D11_PRIMITIVE_TOPOLOGY Topology )
+{
+	context->IASetPrimitiveTopology( Topology );
+}
+
+void Graphics::SetRenderTarget( )
+{
+	context->OMSetRenderTargets( 1, rtv.GetAddressOf( ), dsv.Get( ) );
+}
+
+void Graphics::SetRenderTarget( const Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& RenderTarget )
+{
+	context->OMSetRenderTargets( 1, RenderTarget.GetAddressOf( ),
+								 dsv.Get( ) );
 }
 
 void Graphics::SetViewport(const D3D11_VIEWPORT & Viewport)
@@ -50,12 +63,12 @@ void Graphics::SetIndexBuffer(const Microsoft::WRL::ComPtr<ID3D11Buffer>& IndexB
 	context->IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, NULL);
 }
 
-void Graphics::SetVertexSampler(const Microsoft::WRL::ComPtr<ID3D11SamplerState> Sampler)
+void Graphics::SetVertexSampler(const Microsoft::WRL::ComPtr<ID3D11SamplerState> &Sampler)
 {
 	context->VSSetSamplers(NULL, 1, Sampler.GetAddressOf());
 }
 
-void Graphics::SetPixelSampler(const Microsoft::WRL::ComPtr<ID3D11SamplerState> Sampler)
+void Graphics::SetPixelSampler(const Microsoft::WRL::ComPtr<ID3D11SamplerState> &Sampler)
 {
 	context->PSSetSamplers(NULL, 1, Sampler.GetAddressOf());
 }
@@ -90,4 +103,9 @@ void Graphics::SetPixelShader(const Microsoft::WRL::ComPtr<ID3D11PixelShader>& P
 	context->PSSetShader(PixelShader.Get(), nullptr, NULL);
 }
 
+void Graphics::Render( UINT VertexCount, UINT StartIndex )
+{
+	context->DrawIndexed( VertexCount, 0, 0 );
+	//context->Draw( VertexCount, StartIndex );
+}
 

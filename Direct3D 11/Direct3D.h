@@ -12,14 +12,14 @@ public:
 	~Direct3D();
 
 	ID3D11Texture2D *CreateTexture(int Width, int Height, DXGI_FORMAT Format, 
-		D3D11_BIND_FLAG Flag, void**ppInitialData = nullptr);
-	ID3D11Buffer *CreateVertexBuffer(int Size, int SizeOfElements,
-		void** ppInitialData);
-	ID3D11Buffer *CreateIndexBuffer(int Size, int SizeOfElements = sizeof(DWORD),
-		void** ppInitialData = nullptr);
-	ID3D11Buffer *CreateConstantBuffer(int Size, int SizeOfElements,
-		void** ppInitialData = nullptr);
-	ID3D11ShaderResourceView *CreateShaderResource(ID3D11Texture2D *Resource);
+		D3D11_BIND_FLAG Flag, BYTE**ppInitialData = nullptr)const;
+	ID3D11Buffer *CreateVertexBuffer(int ElementCount, int SizeOfElement,
+		void** ppInitialData = nullptr)const;
+	ID3D11Buffer *CreateIndexBuffer(int ElementCount, int SizeOfElement,
+		void** ppInitialData = nullptr)const;
+	ID3D11Buffer *CreateConstantBuffer(int ElementCount, int SizeOfElement,
+		void** ppInitialData = nullptr)const;
+	ID3D11ShaderResourceView *CreateShaderResource(ID3D11Texture2D *Resource)const;
 
 	ID3D11Device *GetDevice()const;
 	ID3D11DeviceContext *GetContext()const;
@@ -29,8 +29,8 @@ public:
 private:
 	void InitDeviceAndSwapchain(const Window &Win);
 	void InitRenderTargetAndDepthViews(int Width, int Height);
-	ID3D11Buffer *CreateBuffer(int Size, int SizeOfElements,
-		const D3D11_BUFFER_DESC &BuffDes, void** ppInitialData);
+	ID3D11Buffer *CreateBuffer(const D3D11_BUFFER_DESC &BuffDes, 
+		void** ppInitialData = nullptr)const;
 
 private:
 	// The device is used to allocate resources like textures and shaders

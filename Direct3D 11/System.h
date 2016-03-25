@@ -15,6 +15,7 @@ public:
 
 private:
 	Window win;
+	Direct3D d3d;
 	Game game;
 };
 

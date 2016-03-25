@@ -27,6 +27,8 @@ Window::Window(UINT Width, UINT Height, HINSTANCE Instance, INT CmdShow, System 
 	// data and show window
 	classname = L"MyClass";
 	title = L"Direct3D Framework";
+	int ex_style = WS_EX_OVERLAPPEDWINDOW;
+	int style = WS_OVERLAPPEDWINDOW;
 
 	WNDCLASSEX wc{};
 	wc.cbSize = sizeof(WNDCLASSEX);
@@ -38,10 +40,10 @@ Window::Window(UINT Width, UINT Height, HINSTANCE Instance, INT CmdShow, System 
 
 	INT x = 100, y = 100;
 	RECT r{ x, y, x + static_cast<INT>(width), y + static_cast<INT>(height) };
-	AdjustWindowRectEx(&r, 0, FALSE, 0);
+	AdjustWindowRectEx(&r, style, FALSE, ex_style );
 
 	hWnd = CreateWindowEx(
-		0, classname.data(), title.data(), 0, r.left, r.top, r.right - r.left, 
+		ex_style, classname.data(), title.data(), style, r.left, r.top, r.right - r.left,
 		r.bottom - r.top, nullptr, nullptr, Instance, pSystem);
 
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pSystem));
