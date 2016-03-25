@@ -28,7 +28,7 @@ void Shader::LoadShaderFile( const std::string & Filename, DirectX::Blob & Shade
 	assert( shader_file.is_open( ) );
 
 	// Get length of file using the get pointer position, then return to beginning
-	int file_size = shader_file.tellg( );
+	int file_size = static_cast<int>( shader_file.tellg( ) );
 	shader_file.seekg( std::ios::beg );
 
 	// Read data from file and store the size into the Blob object

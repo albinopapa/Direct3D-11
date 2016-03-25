@@ -18,8 +18,8 @@ Camera::Camera( const Window & Win )
 	orientation( XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) ),
 	vertical_fov( XMConvertToRadians( 70 ) )
 {
-	viewport.Width = Win.GetWidth( );
-	viewport.Height = Win.GetHeight( );
+	viewport.Width = static_cast<float>( Win.GetWidth( ) );
+	viewport.Height = static_cast<float>( Win.GetHeight( ) );
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.MinDepth = 0.1f;

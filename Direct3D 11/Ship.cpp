@@ -25,7 +25,7 @@ Ship::~Ship()
 
 void Ship::Update(float DeltaTime)
 {
-	
+	orientation.y += 0.01f;
 }
 
 DirectX::XMMATRIX Ship::GetWorld() const
