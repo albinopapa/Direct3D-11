@@ -6,37 +6,51 @@ Ship::Ship( )
 	:
 	position( 0.0f, 0.0f, 0.0f ),
 	orientation( 0.0f, 0.0f, 0.0f, 0.0f )
-{}
-
-Ship::Ship(const Direct3D &D3D)
-	:
-	texture( L"Images\\LightingTricks.png", D3D ),
-	position( 0.0f, 0.0f, 10.0 ),
-	orientation( 0.0f, 0.0f, 0.0f, 1.0f )
 {
-	mesh.CreatePlane( D3D );
-	constant_buffer = D3D.CreateConstantBuffer( 1, sizeof( DirectX::TransformBuffer ) );
-}
 
+}
 
 Ship::~Ship()
 {
 }
 
+void Ship::Init(float X, float Y, float Z, const Texture Tex,
+	const Direct3D &D3D)
+{
+	mesh.CreatePlane(D3D);
+	constant_buffer = D3D.CreateConstantBuffer(1, 
+		sizeof(DirectX::TransformBuffer));
+	SetPosition(X, Y, Z);
+	SetTexture(Tex);
+}
+
 void Ship::Update(float DeltaTime)
 {
-	orientation.y += 0.01f;
+	orientation.y += DeltaTime;
+}
+
+void Ship::Draw(Graphics &Gfx)
+{
+	Gfx.SetVertexBuffer(mesh.GetVertexBuffer(), sizeof(Model_Position_Texcoord::Vertex));
+	Gfx.SetIndexBuffer(mesh.GetIndexBuffer());
+	Gfx.SetTopology(mesh.GetTopology());
+	Gfx.SetPixelShaderResource(texture.GetResource());
+	Gfx.SetVertexConstantBuffer(constant_buffer);
+
+	Gfx.Render(mesh.GetVertexCount());
 }
 
 DirectX::XMMATRIX Ship::GetWorld() const
 {
 	XMVECTOR mPos = XMLoadFloat3(&position);
 	XMVECTOR mOri = XMLoadFloat4(&orientation);
+	XMVECTOR mScal = XMVectorSet( 10.0f, 10.0f, 10.0f, 1.0f );
 
 	XMMATRIX translation = XMMatrixTranslationFromVector(mPos);
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(mOri);
+	XMMATRIX scale = XMMatrixScalingFromVector( mScal );
 
-	XMMATRIX world = rotation * translation;
+	XMMATRIX world = rotation * scale * translation;
 
 	return world;
 }
@@ -46,13 +60,12 @@ const Microsoft::WRL::ComPtr<ID3D11Buffer> &Ship::GetConstBuffer( )const
 	return constant_buffer;
 }
 
-void Ship::Draw( Graphics &Gfx )
+void Ship::SetPosition(float X, float Y, float Z)
 {
-	Gfx.SetVertexBuffer( mesh.GetVertexBuffer( ), sizeof( Model_Position_Texcoord::Vertex ) );
-	Gfx.SetIndexBuffer( mesh.GetIndexBuffer( ) );
-	Gfx.SetTopology( mesh.GetTopology( ) );
-	Gfx.SetVertexConstantBuffer( constant_buffer );
-	Gfx.SetPixelShaderResource( texture.GetResource( ) );
+	position = XMFLOAT3(X, Y, Z);
+}
 
-	Gfx.Render( mesh.GetVertexCount( ) );
+void Ship::SetTexture(const Texture Tex)
+{
+	texture = Tex;
 }

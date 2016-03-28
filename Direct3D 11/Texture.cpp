@@ -58,8 +58,32 @@ Texture::Texture( const std::wstring &Filename, const Direct3D & D3D )
 	srv = D3D.CreateShaderResource( tex );
 }
 
+Texture::Texture(const Texture & Tex)
+	:
+	srv(Tex.srv)
+{
+}
+
+Texture::Texture(Texture && Tex)
+	:
+	srv(std::move(srv))
+{
+}
+
 Texture::~Texture( )
 { 
+}
+
+Texture & Texture::operator=(Texture && Tex)
+{
+	srv = std::move(Tex.srv);
+	return *this;
+}
+
+Texture & Texture::operator=(const Texture & Tex)
+{
+	srv = Tex.srv;
+	return *this;
 }
 
 const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& Texture::GetResource( ) const

@@ -57,7 +57,8 @@ void Model_Position_Texcoord::CreatePlane(const Direct3D & D3D)
 
 	// Create the vertex buffer using the vector of vertices
 	Vertex *pVertices = vertices.data();
-	vertex_buffer = D3D.CreateVertexBuffer(vertices.size(), sizeof(Vertex),
+	vertex_buffer = D3D.CreateVertexBuffer(static_cast<int>(vertices.size()), 
+											static_cast<int>(sizeof(Vertex)),
 		reinterpret_cast<void**>(&pVertices));
 
 	// The vertices are in the correct order to be rendered, so we can just use
@@ -71,8 +72,8 @@ void Model_Position_Texcoord::CreatePlane(const Direct3D & D3D)
 
 }
 
-UINT Model_Position_Texcoord::GetVertexCount( ) const
-{
+size_t Model_Position_Texcoord::GetVertexCount( ) const
+{		
 	return vertices.size();
 }
 

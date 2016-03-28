@@ -16,7 +16,7 @@ public:
 	Model_Position_Texcoord();
 
 	void CreatePlane(const Direct3D &D3D);
-	UINT GetVertexCount( )const;
+	size_t GetVertexCount( )const;
 	const Microsoft::WRL::ComPtr<ID3D11Buffer> & GetVertexBuffer()const;
 	const Microsoft::WRL::ComPtr<ID3D11Buffer> & GetIndexBuffer()const;
 	D3D11_PRIMITIVE_TOPOLOGY GetTopology( )const;

@@ -20,12 +20,15 @@ public:
 	ID3D11Buffer *CreateConstantBuffer(int ElementCount, int SizeOfElement,
 		void** ppInitialData = nullptr)const;
 	ID3D11ShaderResourceView *CreateShaderResource(ID3D11Texture2D *Resource)const;
-
+	ID3D11DepthStencilState *CreateDepthStencilState( D3D11_DEPTH_STENCIL_DESC * DS_Desc = nullptr )const;
 	const Microsoft::WRL::ComPtr<ID3D11Device> &GetDevice()const;
 	const Microsoft::WRL::ComPtr<ID3D11DeviceContext> &GetContext()const;
 	const Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &GetRenderTarget()const;
 	const Microsoft::WRL::ComPtr<ID3D11DepthStencilView> &GetDepthStencilView()const;
 	const Microsoft::WRL::ComPtr<IDXGISwapChain> &GetSwapChain()const;
+#if _DEBUG
+	const Microsoft::WRL::ComPtr<ID3D11Debug> &GetDebug( )const;
+#endif
 private:
 	void InitDeviceAndSwapchain(const Window &Win);
 	void InitRenderTargetAndDepthViews(int Width, int Height);
@@ -44,6 +47,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
 	// The depth stencil view is the texture that depth is rendered to.
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv;
+#if _DEBUG
+	// Debugger
+	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
+#endif
 	// Feature level helps determine code paths for different level of hardware
 	D3D_FEATURE_LEVEL current_level;
 };

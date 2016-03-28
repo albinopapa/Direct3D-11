@@ -1,5 +1,5 @@
 #include "Game.h"
-
+#include <time.h>
 
 
 Game::Game( const Direct3D &D3D, Window &Win)
@@ -7,13 +7,23 @@ Game::Game( const Direct3D &D3D, Window &Win)
 	gfx( D3D, Win ),
 	win( Win ),
 	sprite_shader( D3D ),
-	ship( D3D ),
-	cam( Win )
+	cam( Win ),
+	tex_test(L"Images\\LightingTricks.png", D3D)
 {
-	sprite_shader.LoadShaderFiles( "Shaders\\Sprite_Vertex_Shader.cso",
-								   "Shaders\\Sprite_Pixel_Shader.cso",
+	srand(static_cast<unsigned int>(time(nullptr)));
+
+	sprite_shader.LoadShaderFiles( L"Shaders\\Sprite_Vertex_Shader.cso",
+								   L"Shaders\\Sprite_Pixel_Shader.cso",
 								   D3D.GetDevice( ) );
-	
+	for (int i = 0; i < 100; ++i)
+	{
+		float x = static_cast<float>(rand() % 100 - 50);
+		float y = static_cast<float>(rand() % 100 - 50);
+		float z = static_cast<float>(rand() % 100 - 50);
+
+		model_test[i].Init(x, y, z, tex_test, D3D);
+	}
+	gfx.SetDepthState( );
 }
 
 
@@ -25,16 +35,26 @@ void Game::UpdateFrame()
 {
 	DirectX::TransformBuffer tb{};
 	float dt = 1.0f / 60.0f;
+
 	cam.Update( dt );
-	ship.Update( dt );
+	for (int i = 0; i < 100; ++i)
+	{
+		model_test[i].Update(0.0f);
+	}
+	//ship.Update( dt );
 
 	// View and projection stay the same for entire frame
 	tb.view = DirectX::XMMatrixTranspose(cam.GetView( ));
 	tb.projection = DirectX::XMMatrixTranspose( cam.GetProjection( win ));
 
 	// World matrix and constant buffer needs to be updated for each model
-	tb.world = DirectX::XMMatrixTranspose( ship.GetWorld());
-	sprite_shader.UpdateVertexConstBuffer( sizeof( tb ), &tb, ship.GetConstBuffer( ) );
+	for (int i = 0; i < 100; ++i)
+	{
+		tb.world = DirectX::XMMatrixTranspose(model_test[i].GetWorld());
+		sprite_shader.UpdateVertexConstBuffer(sizeof(tb), &tb, model_test[i].GetConstBuffer());
+	}
+	/*tb.world = DirectX::XMMatrixTranspose( ship.GetWorld());
+	sprite_shader.UpdateVertexConstBuffer( sizeof( tb ), &tb, ship.GetConstBuffer( ) );*/
 
 
 	gfx.BeginFrame();
@@ -49,5 +69,9 @@ void Game::ComposeFrame()
 	
 	sprite_shader.Set( gfx );
 
-	ship.Draw( gfx );
+	for (int i = 0; i < 100; ++i)
+	{
+		model_test[i].Draw(gfx);
+	}
+	//ship.Draw( gfx );
 }

@@ -59,7 +59,7 @@ DirectX::XMMATRIX Camera::GetProjection(const Window &Win) const
 
 	float screen_ratio = height / width;
 	XMMATRIX projection = XMMatrixPerspectiveFovLH(
-		vertical_fov, screen_ratio, 0.1f, 1.0f);
+		vertical_fov, screen_ratio, 0.1f, 1000.0f);
 	return projection;
 }
 

@@ -115,6 +115,23 @@ ID3D11ShaderResourceView * Direct3D::CreateShaderResource(ID3D11Texture2D * Reso
 	return srv;
 }
 
+ID3D11DepthStencilState * Direct3D::CreateDepthStencilState(
+	D3D11_DEPTH_STENCIL_DESC * DS_Desc )const
+{																  
+	// The state of the depth buffer
+	ID3D11DepthStencilState *depth_state;
+	CD3D11_DEPTH_STENCIL_DESC ds_dec( D3D11_DEFAULT );
+	if( !DS_Desc )
+	{
+		DS_Desc = &ds_dec;
+	}
+
+	HRESULT hr = device->CreateDepthStencilState( DS_Desc, &depth_state );
+	assert( SUCCEEDED( hr ) );
+
+	return depth_state;
+}
+
 const Microsoft::WRL::ComPtr<ID3D11Device> &Direct3D::GetDevice() const
 {
 	return device;
@@ -139,7 +156,12 @@ const Microsoft::WRL::ComPtr<IDXGISwapChain> &Direct3D::GetSwapChain() const
 {
 	return swapchain;
 }
-
+#if _DEBUG
+const Microsoft::WRL::ComPtr<ID3D11Debug>& Direct3D::GetDebug( ) const
+{
+	return debug;
+}
+#endif
 void Direct3D::InitDeviceAndSwapchain(const Window & Win)
 {
 	// Describe the swap chain to Direct3D
@@ -150,6 +172,10 @@ void Direct3D::InitDeviceAndSwapchain(const Window & Win)
 	scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	// Refresh rate, numerator = 60, denominator = 1 -> 60 Hz
 	scd.BufferDesc.RefreshRate = { 60, 1 };
+	// Set scaling
+	scd.BufferDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
+	// Set scanline order
+	scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
 	// Assign the swap chain as a render target
 	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	
@@ -205,6 +231,10 @@ void Direct3D::InitDeviceAndSwapchain(const Window & Win)
 		);
 
 	assert(SUCCEEDED(hr));
+
+#if _DEBUG
+	hr = device.As( &debug );	
+#endif
 }
 
 void Direct3D::InitRenderTargetAndDepthViews(int Width, int Height)
@@ -213,6 +243,8 @@ void Direct3D::InitRenderTargetAndDepthViews(int Width, int Height)
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> back_buffer;
 	HRESULT hr = swapchain->GetBuffer(0, IID_PPV_ARGS(back_buffer.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	DXGI_SWAP_CHAIN_DESC scd{};
+	swapchain->GetDesc( &scd );
 
 	// Use the texture to initialize the render target view
 	hr = device->CreateRenderTargetView(back_buffer.Get(), nullptr, rtv.GetAddressOf());
@@ -221,8 +253,7 @@ void Direct3D::InitRenderTargetAndDepthViews(int Width, int Height)
 	// Create a 2d texture resource to create the depth buffer
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depth_buffer;
 
-	// Zeroing the texture description to reuse for depth buffer texture resource 
-	// description
+	// Create a texture resource to use for the depth buffer
 	D3D11_TEXTURE2D_DESC td{};
 	td.Width = Width;
 	td.Height = Height;
@@ -239,6 +270,7 @@ void Direct3D::InitRenderTargetAndDepthViews(int Width, int Height)
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc{};
 	dsv_desc.Format = td.Format;
 	dsv_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
 	hr = device->CreateDepthStencilView(depth_buffer.Get(), &dsv_desc, dsv.GetAddressOf());
 	assert(SUCCEEDED(hr));
 }

@@ -5,6 +5,8 @@
 #include <assert.h>
 #include "Common.h"
 #include "Graphics.h"
+#include <d3dcompiler.h>
+#pragma comment (lib, "d3dcompiler.lib")
 
 class Shader
 {
@@ -13,8 +15,8 @@ public:
 	Shader(const Direct3D &D3D);
 	virtual ~Shader();
 
-	virtual void LoadShaderFiles(const std::string &VertexShaderFilename,
-		const std::string &PixelShaderFilename,
+	virtual void LoadShaderFiles(const std::wstring &VertexShaderFilename,
+		const std::wstring &PixelShaderFilename,
 		const Microsoft::WRL::ComPtr<ID3D11Device> &Device) = 0;
 	virtual void Set( Graphics &Gfx ) = 0;
 
@@ -25,7 +27,7 @@ protected:
 	virtual void Initialize(const DirectX::Blob &VertexBlob,
 		const DirectX::Blob &PixelBlob,
 		const Microsoft::WRL::ComPtr<ID3D11Device> &Device) = 0;
-	void LoadShaderFile( const std::string &Filename, DirectX::Blob &ShaderBlob );
+	DirectX::Blob LoadShaderFile( const std::wstring &Filename);
 protected:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	// Layout of the vertex buffer

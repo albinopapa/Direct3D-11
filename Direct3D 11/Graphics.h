@@ -1,6 +1,7 @@
 #pragma once
 #include "Direct3D.h"
 
+
 class Graphics
 {
 public:
@@ -13,6 +14,8 @@ public:
 	void SetTopology( D3D11_PRIMITIVE_TOPOLOGY Topology );
 	void SetRenderTarget( );
 	void SetRenderTarget( const Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &RenderTarget );
+	void SetDepthState( );
+	void SetDepthState( const Microsoft::WRL::ComPtr<ID3D11DepthStencilState> &DepthState, UINT StencilRef );
 	void SetViewport( const D3D11_VIEWPORT &Viewport );
 	void SetInputLayout( const Microsoft::WRL::ComPtr<ID3D11InputLayout> &Layout );
 	void SetVertexBuffer( const Microsoft::WRL::ComPtr<ID3D11Buffer> &VertexBuffer,
@@ -33,5 +36,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_enabled;
+	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 };
 

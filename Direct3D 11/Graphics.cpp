@@ -1,5 +1,5 @@
 #include "Graphics.h"
-
+#include <assert.h>
 
 
 Graphics::Graphics( const Direct3D &D3D, const Window &Win )
@@ -8,6 +8,10 @@ Graphics::Graphics( const Direct3D &D3D, const Window &Win )
 	rtv = D3D.GetRenderTarget( );
 	dsv = D3D.GetDepthStencilView( );
 	swapchain = D3D.GetSwapChain( );
+	depth_enabled = D3D.CreateDepthStencilState( );
+#if _DEBUG
+	debug = D3D.GetDebug( );
+#endif
 }
 
 Graphics::~Graphics( )
@@ -23,7 +27,14 @@ void Graphics::BeginFrame( float R, float G, float B, float A )
 
 void Graphics::EndFrame( )
 {
-	swapchain->Present( NULL, NULL );
+	HRESULT hr = S_OK;
+#if _DEBUG
+	hr = debug->ValidateContext( context.Get( ) );
+	assert( SUCCEEDED( hr ) );
+#endif
+
+	hr = swapchain->Present( NULL, NULL );
+	assert( SUCCEEDED( hr ) );
 }
 
 void Graphics::SetTopology( D3D11_PRIMITIVE_TOPOLOGY Topology )
@@ -40,6 +51,16 @@ void Graphics::SetRenderTarget( const Microsoft::WRL::ComPtr<ID3D11RenderTargetV
 {
 	context->OMSetRenderTargets( 1, RenderTarget.GetAddressOf( ),
 								 dsv.Get( ) );
+}
+
+void Graphics::SetDepthState( )
+{
+	context->OMSetDepthStencilState( depth_enabled.Get( ), 0 );
+}
+
+void Graphics::SetDepthState( const Microsoft::WRL::ComPtr<ID3D11DepthStencilState>& DepthState, UINT StencilRef )
+{
+	context->OMSetDepthStencilState( DepthState.Get(), StencilRef );
 }
 
 void Graphics::SetViewport( const D3D11_VIEWPORT & Viewport )
