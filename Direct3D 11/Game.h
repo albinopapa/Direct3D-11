@@ -20,8 +20,7 @@ private:
 	Window &win;
 	Camera cam;
 	Shader_Sprite sprite_shader;
-	//Ship ship;
-	Ship model_test[100];
+	Ship ship;
 	Texture tex_test;
 };
 

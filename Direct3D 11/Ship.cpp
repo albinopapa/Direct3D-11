@@ -26,7 +26,7 @@ void Ship::Init(float X, float Y, float Z, const Texture Tex,
 
 void Ship::Update(float DeltaTime)
 {
-	orientation.y += DeltaTime;
+	//position.z += 0.01f;
 }
 
 void Ship::Draw(Graphics &Gfx)
