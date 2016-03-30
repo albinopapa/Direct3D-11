@@ -26,7 +26,7 @@ void Ship::Init(float X, float Y, float Z, const Texture Tex,
 
 void Ship::Update(float DeltaTime)
 {
-	//position.z += 0.01f;
+	position.z += 0.01f;
 }
 
 void Ship::Draw(Graphics &Gfx)
@@ -44,7 +44,7 @@ DirectX::XMMATRIX Ship::GetWorld() const
 {
 	XMVECTOR mPos = XMLoadFloat3(&position);
 	XMVECTOR mOri = XMLoadFloat4(&orientation);
-	XMVECTOR mScal = XMVectorSet( 10.0f, 10.0f, 10.0f, 1.0f );
+	XMVECTOR mScal = XMVectorSet( 100.0f, 100.0f, 10.0f, 1.0f );
 
 	XMMATRIX translation = XMMatrixTranslationFromVector(mPos);
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(mOri);
