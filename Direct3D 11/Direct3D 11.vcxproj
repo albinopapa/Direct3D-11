@@ -164,7 +164,11 @@
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="KeyboardClient.h" />
+    <ClInclude Include="KeyboardServer.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Model_Position_Color.h" />
+    <ClInclude Include="Model_Position_Texcoord.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shader_Sprite.h" />
@@ -178,7 +182,11 @@
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="KeyboardClient.cpp" />
+    <ClCompile Include="KeyboardServer.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Model_Position_Color.cpp" />
+    <ClCompile Include="Model_Position_Texcoord.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shader_Sprite.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -205,9 +213,6 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Render States to set before rendering.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

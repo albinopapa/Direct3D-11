@@ -15,7 +15,7 @@ System::System(UINT Width, UINT Height, HINSTANCE Instance, INT CmdShow)
 	:
 	win( Width, Height, Instance, CmdShow, this ),
 	d3d( win ),
-	game( d3d, win )
+	game( kServ, d3d, win )
 {
 }
 
@@ -31,6 +31,12 @@ LRESULT System::MsgHandler(UINT Message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+	case WM_KEYUP:
+		kServ.OnKeyRelease(static_cast<unsigned char>(wParam));
+		break;
+	case WM_KEYDOWN:
+		kServ.OnKeyPress(static_cast<unsigned char>(wParam));
 		break;
 	default:
 		res = DefWindowProc(win.GetHandle(), Message, wParam, lParam);

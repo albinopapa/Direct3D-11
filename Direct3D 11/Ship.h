@@ -1,5 +1,6 @@
 #pragma once
-#include "Model.h"
+#include "KeyboardClient.h"
+#include "Model_Position_Texcoord.h"
 #include "Texture.h"
 #include "Graphics.h"
 #include <vector>
@@ -12,7 +13,7 @@ public:
 	
 	void Init(float X, float Y, float Z, const Texture Tex,
 		const Direct3D &D3D);
-	void Update(float DeltaTime);
+	void Update(const KeyboardClient &Kbd, float DeltaTime);
 	void Draw(Graphics &Gfx);
 
 	DirectX::XMMATRIX GetWorld()const;
@@ -25,7 +26,7 @@ private:
 private:
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT4 orientation;
-
+	DirectX::XMFLOAT3 scale;
 	Model_Position_Texcoord mesh;
 	// Constant buffer 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffer;

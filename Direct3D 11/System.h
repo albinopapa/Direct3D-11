@@ -3,6 +3,7 @@
 #include "Window.h"
 #include <Windows.h>
 #include "Game.h"
+#include "KeyboardServer.h"
 
 class System
 {
@@ -16,6 +17,7 @@ public:
 private:
 	Window win;
 	Direct3D d3d;
+	KeyboardServer kServ;
 	Game game;
 };
 

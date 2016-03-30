@@ -2,10 +2,11 @@
 
 using namespace DirectX;
 
-Ship::Ship( )
+Ship::Ship()
 	:
-	position( 0.0f, 0.0f, 0.0f ),
-	orientation( 0.0f, 0.0f, 0.0f, 0.0f )
+	position(0.0f, 0.0f, 0.0f),
+	orientation(0.0f, 0.0f, 0.0f, 0.0f),
+	scale(10.0f, 10.0f, 1.0f)
 {
 
 }
@@ -24,9 +25,46 @@ void Ship::Init(float X, float Y, float Z, const Texture Tex,
 	SetTexture(Tex);
 }
 
-void Ship::Update(float DeltaTime)
+void Ship::Update(const KeyboardClient &Kbd, float DeltaTime)
 {
-	position.z += 0.01f;
+	const float const_speed = 0.1f;
+	XMFLOAT3 temp = position;
+
+	if (Kbd.KeyPressed(VK_LEFT))
+	{
+		temp.x -= const_speed;
+	}
+	else if(Kbd.KeyPressed(VK_RIGHT))
+	{
+		temp.x += const_speed;
+	}
+	if (Kbd.KeyPressed(VK_UP))
+	{
+		temp.y += const_speed;
+	}
+	else if (Kbd.KeyPressed(VK_DOWN))
+	{
+		temp.y -= const_speed;
+	}
+	if (Kbd.KeyPressed(VK_ADD))
+	{
+		scale.x += 0.1f;
+		scale.y += 0.1f;
+	}
+	else if (Kbd.KeyPressed(VK_SUBTRACT))
+	{
+		scale.x -= 0.1f;
+		scale.y -= 0.1f;
+	}
+
+	// TODO: Get min/max from screen clip rect or bounding view frustum
+	// Clip rect for 2D renders, BoundingFrustum for 3D renders
+	temp.x = max(-400.0f + 8, min(temp.x, 399.0f - 8));
+	temp.y = max(-300.0f + 12, min(temp.y, 299.0f - 12));
+	scale.x = max(10.0f, min(100.0f, scale.x));
+	scale.y = max(10.0f, min(100.0f, scale.y));
+
+	position = temp;
 }
 
 void Ship::Draw(Graphics &Gfx)
@@ -44,7 +82,7 @@ DirectX::XMMATRIX Ship::GetWorld() const
 {
 	XMVECTOR mPos = XMLoadFloat3(&position);
 	XMVECTOR mOri = XMLoadFloat4(&orientation);
-	XMVECTOR mScal = XMVectorSet( 100.0f, 100.0f, 10.0f, 1.0f );
+	XMVECTOR mScal = XMLoadFloat3(&scale);
 
 	XMMATRIX translation = XMMatrixTranslationFromVector(mPos);
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(mOri);

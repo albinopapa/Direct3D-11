@@ -58,7 +58,8 @@ DirectX::XMMATRIX Camera::GetProjection(const Window &Win) const
 	float width = static_cast<float>(Win.GetWidth());
 
 	float screen_ratio = height / width;
-	XMMATRIX projection = XMMatrixOrthographicLH(viewport.Width, viewport.Height, 1.0f, 100.0f);
+	XMMATRIX projection = XMMatrixOrthographicLH(viewport.Width, 
+		viewport.Height, 1.0f, 100.0f);
 	/*XMMATRIX projection = XMMatrixPerspectiveFovLH(
 		vertical_fov, screen_ratio, 0.1f, 100.0f);*/
 	return projection;
@@ -68,3 +69,4 @@ const D3D11_VIEWPORT & Camera::GetViewport( ) const
 {
 	return viewport;
 }
+
